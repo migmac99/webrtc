@@ -1,7 +1,8 @@
 import React from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import CreateRoom from './routes/CreateRoom'
-import Room from './routes/Room'
+
+import CreateRoom from './Pages/CreateRoom'
+import Room from './Pages/Room'
 
 function App() {
   return (
