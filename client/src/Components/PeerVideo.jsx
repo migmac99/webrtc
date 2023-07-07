@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 
 import { Video } from './Video'
-import ControlSmall from './ControlSmall'
+import { ControlSmall } from './Controls'
 
 export default function PeerVideo({ peersRef, peer, userUpdate }) {
 

@@ -57,6 +57,31 @@ export default function Controls({ userVideo, socketRef, userUpdate }) {
   )
 }
 
+export function ControlSmall({ audio, video }) {
+  return (
+    <div style={{
+      display: 'flex',
+      zIndex: 1,
+      marginTop: '-2.2rem',
+      margin: '-2.2rem 0.3rem 0 0.3rem',
+    }}>
+      <div style={{ flexGrow: 1 }} />
+      <div style={{
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        borderRadius: '1rem',
+        display: 'flex',
+        justifyContent: 'flex-start',
+        flexShrink: 1,
+        alignItems: 'center',
+        zIndex: 2,
+      }}>
+        <Toggler {...{ src: video ? webcam : webcamoff }} />
+        <Toggler {...{ src: audio ? micunmute : micmute }} />
+      </div>
+    </div>
+  )
+}
+
 function Toggler({ src, onClick }) {
   return (
     <img
@@ -65,6 +90,7 @@ function Toggler({ src, onClick }) {
         height: '1.5rem',
         cursor: 'pointer',
         margin: '0.2rem',
+        opacity: onClick ? 1 : 0.5,
       }}
       onClick={onClick}
     />

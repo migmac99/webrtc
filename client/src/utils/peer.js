@@ -20,7 +20,7 @@ export function createStream({
 }) {
 
   navigator.mediaDevices
-    .getUserMedia({ video: videoConstraints, audio: false })
+    .getUserMedia({ video: videoConstraints, audio: true })
     .then((stream) => {
       userVideo.current.srcObject = stream
 
