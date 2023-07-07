@@ -30,18 +30,27 @@ const Room = (props) => {
     })
   }, [])
 
+  const w = '16rem'
+  const h = '10rem'
+
   return (
     <div>
 
-      <div style={{
-        height: '10rem',
-        width: '16rem',
-      }}>
+      <div style={{ height: h, width: w }}>
         <Video ref={userVideo} />
         <Controls {...{ userVideo, socketRef, userUpdate }} />
       </div>
 
-      {/* {peers.map((peer, index) => <PeerVideo key={index} {...{ peersRef, peer, userUpdate }} />)} */}
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'left',
+        alignItems: 'left',
+        height: h,
+        width: w,
+      }}>
+        {peers.map((peer, index) => <PeerVideo key={index} {...{ peersRef, peer, userUpdate }} />)}
+      </div>
     </div>
   )
 }
