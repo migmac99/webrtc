@@ -4,9 +4,7 @@ import { Video } from './Video'
 import ControlSmall from './ControlSmall'
 
 export default function PeerVideo({ peersRef, peer, userUpdate }) {
-  // get ref from peersRef that matches peer.peerID
 
-  // ref is the object of peersRef which has the same peerID as peer.peerID
   const ref = useRef(peersRef.current.find((p) => p.peerID === peer.peerID).ref)
   const _peer = peersRef.current.find((p) => p.peerID === peer.peerID).peer
 
@@ -28,7 +26,7 @@ export default function PeerVideo({ peersRef, peer, userUpdate }) {
   }
 
   return (
-    <div key={peer.peerID} >
+    <div>
       <Video ref={ref} external={true} />
       <ControlSmall {...{ audio: audioFlagTemp, video: videoFlagTemp }} />
     </div>

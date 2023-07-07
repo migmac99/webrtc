@@ -17,10 +17,7 @@ const Room = (props) => {
 
   const roomID = props.match.params.roomID
   const videoConstraints = {
-    minAspectRatio: 1.333,
     minFrameRate: 60,
-    height: window.innerHeight / 1.8,
-    width: window.innerWidth / 2,
   }
 
   useEffect(() => {
@@ -33,14 +30,18 @@ const Room = (props) => {
     })
   }, [])
 
-
   return (
-    <div style={{ height: '100%', width: '10rem' }}>
+    <div>
 
-      <Video ref={userVideo} />
-      <Controls {...{ userVideo, socketRef, userUpdate }} />
+      <div style={{
+        height: '10rem',
+        width: '16rem',
+      }}>
+        <Video ref={userVideo} />
+        <Controls {...{ userVideo, socketRef, userUpdate }} />
+      </div>
 
-      {peers.map((peer, index) => <PeerVideo key={index} {...{ peersRef, peer, userUpdate }} />)}
+      {/* {peers.map((peer, index) => <PeerVideo key={index} {...{ peersRef, peer, userUpdate }} />)} */}
     </div>
   )
 }

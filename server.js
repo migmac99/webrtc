@@ -1,21 +1,30 @@
+require('dotenv').config()
+
 const express = require('express')
+const path = require('path')
 const http = require('http')
+
 const app = express()
 const server = http.createServer(app)
+
 const socket = require('socket.io')
-const io = socket(server)
-require('dotenv').config()
-const path = require('path')
+const io = socket(server, {
+    pingInterval: 2000,
+    pingTimeout: 4000,
+    upgradeTimeout: 5000,
+})
 
 const users = {}
-
 const socketToRoom = {}
+
+const roomSize = 22
+const PORT = process.env.PORT || 8000
 
 io.on('connection', socket => {
     socket.on('join room', roomID => {
         if (users[roomID]) {
             const length = users[roomID].length
-            if (length === 4) {
+            if (length >= roomSize) {
                 socket.emit('room full')
                 return
             }
@@ -49,10 +58,8 @@ io.on('connection', socket => {
     socket.on('change', (payload) => {
         socket.broadcast.emit('change', payload)
     })
-
 })
 
-const PORT = process.env.PORT || 8000
 if (process.env.PROD) {
     app.use(express.static(__dirname + '/client/build'))
     app.get('*', (request, response) => {
@@ -60,6 +67,6 @@ if (process.env.PROD) {
     })
 }
 
-server.listen(process.env.PORT || 8000, () => console.log('server is running...'))
+server.listen(PORT, () => console.log('server is running...'))
 
 

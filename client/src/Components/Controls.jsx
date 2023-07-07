@@ -37,20 +37,20 @@ export default function Controls({ userVideo, socketRef, userUpdate }) {
                     id: socketRef.current.id,
                     videoFlag: false,
                     audioFlag,
-                  }]);
-                  track.enabled = false;
-                  setVideoFlag(false);
+                  }])
+                  track.enabled = false
+                  setVideoFlag(false)
                 } else {
                   socketRef.current.emit('change', [...userUpdate, {
                     id: socketRef.current.id,
                     videoFlag: true,
                     audioFlag,
-                  }]);
-                  track.enabled = true;
-                  setVideoFlag(true);
+                  }])
+                  track.enabled = true
+                  setVideoFlag(true)
                 }
               }
-            });
+            })
           }
         }}
       />
@@ -70,20 +70,20 @@ export default function Controls({ userVideo, socketRef, userUpdate }) {
                     id: socketRef.current.id,
                     videoFlag,
                     audioFlag: false,
-                  }]);
-                  track.enabled = false;
-                  setAudioFlag(false);
+                  }])
+                  track.enabled = false
+                  setAudioFlag(false)
                 } else {
                   socketRef.current.emit('change', [...userUpdate, {
                     id: socketRef.current.id,
                     videoFlag,
                     audioFlag: true,
-                  }]);
-                  track.enabled = true;
-                  setAudioFlag(true);
+                  }])
+                  track.enabled = true
+                  setAudioFlag(true)
                 }
               }
-            });
+            })
           }
         }}
       />

@@ -1,6 +1,5 @@
 
-import React, { useRef, useEffect } from 'react'
-
+import React from 'react'
 
 export const Video = React.forwardRef((props, ref) => {
   const { external } = props
@@ -13,11 +12,10 @@ export const Video = React.forwardRef((props, ref) => {
       playsInline
       style={{
         width: '100%',
-        position: 'static',
-        borderRadius: '10px',
-        overflow: 'hidden',
-        margin: '1px',
-        border: '5px solid gray',
+        height: '100%',
+        objectFit: 'cover',
+        borderRadius: '1rem',
+        border: '0.3rem solid gray',
       }}
     />
   )
