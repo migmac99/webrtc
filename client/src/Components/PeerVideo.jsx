@@ -11,7 +11,7 @@ export default function PeerVideo({ peersRef, peer, userUpdate }) {
   useEffect(() => {
     console.log(peersRef.current, _peer, ref)
     _peer.on('stream', (stream) => { ref.current.srcObject = stream })
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   let audioFlagTemp = true
   let videoFlagTemp = true

@@ -28,7 +28,7 @@ const Room = (props) => {
       peersRef, socketRef,
       set_peers, set_userUpdate,
     })
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const w = '16rem'
   const h = '10rem'

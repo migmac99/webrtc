@@ -85,6 +85,7 @@ export function ControlSmall({ audio, video }) {
 function Toggler({ src, onClick }) {
   return (
     <img
+      alt='toggle'
       src={src}
       style={{
         height: '1.5rem',
