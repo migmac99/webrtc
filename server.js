@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express')
 const http = require('http')
 
@@ -13,9 +15,9 @@ const io = socket(server, {
 
 const rooms = {}
 
-const ROOM_SIZE = 22
-const PORT = 8000
-const logs = true
+const ROOM_SIZE = process.env.ROOM_SIZE || 22
+const PORT = process.env.PORT || 8000
+const logs = process.env.LOGS || false
 
 io.on('connection', socket => {
     logs && console.log('Connection from ->', [socket.id])
