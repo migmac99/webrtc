@@ -1,7 +1,4 @@
-require('dotenv').config()
-
 const express = require('express')
-const path = require('path')
 const http = require('http')
 
 const app = express()
@@ -14,27 +11,31 @@ const io = socket(server, {
     upgradeTimeout: 5000,
 })
 
-const users = {}
-const socketToRoom = {}
+const rooms = {}
 
-const roomSize = 22
-const PORT = process.env.PORT || 8000
+const ROOM_SIZE = 22
+const PORT = 8000
+const logs = true
 
 io.on('connection', socket => {
+    logs && console.log('Connection from ->', [socket.id])
+
     socket.on('join room', roomID => {
-        if (users[roomID]) {
-            const length = users[roomID].length
-            if (length >= roomSize) {
+        if (rooms[roomID]) {
+            const length = rooms[roomID].length
+            if (length >= ROOM_SIZE) {
                 socket.emit('room full')
                 return
             }
-            users[roomID].push(socket.id)
+            rooms[roomID].push(socket.id)
         } else {
-            users[roomID] = [socket.id]
+            rooms[roomID] = [socket.id]
+            logs && console.log('New room ->', roomID)
         }
-        socketToRoom[socket.id] = roomID
-        const usersInThisRoom = users[roomID].filter(id => id !== socket.id)
+
+        const usersInThisRoom = rooms[roomID].filter(id => id !== socket.id)
         socket.emit('all users', usersInThisRoom)
+        logs && console.log('Join', roomID, '->', [socket.id])
     })
 
     socket.on('sending signal', payload => {
@@ -46,27 +47,31 @@ io.on('connection', socket => {
     })
 
     socket.on('disconnect', () => {
-        const roomID = socketToRoom[socket.id]
-        let room = users[roomID]
+        const roomID = Object.keys(rooms).find(key => rooms[key].includes(socket.id))
+        let room = rooms[roomID]
         if (room) {
             room = room.filter(id => id !== socket.id)
-            users[roomID] = room
+            rooms[roomID] = room
+        }
+        if (rooms[roomID]) {
+            if (rooms[roomID].length === 0) {
+                delete rooms[roomID]
+                logs && console.log('Deleting room ->', roomID)
+            }
         }
         socket.broadcast.emit('user left', socket.id)
+        logs && console.log('user left', socket.id)
     })
 
     socket.on('change', (payload) => {
         socket.broadcast.emit('change', payload)
+        logs && console.log('change', payload)
     })
 })
 
-if (process.env.PROD) {
-    app.use(express.static(__dirname + '/client/build'))
-    app.get('*', (request, response) => {
-        response.sendFile(path.join(__dirname, 'client/build/index.html'))
-    })
-}
-
-server.listen(PORT, () => console.log('server is running...'))
+server.listen(PORT, () => console.log('server is running on port', PORT, '...'))
 
 
+// For debugging only, not required for production
+app.get('/', (req, res) => res.sendFile(__dirname + '/viewRooms.html'))
+app.get('/api/rooms', (req, res) => res.send(rooms))
