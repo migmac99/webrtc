@@ -8,9 +8,9 @@ const server = http.createServer(app)
 
 const socket = require('socket.io')
 const io = socket(server, {
-    pingInterval: 2000,
-    pingTimeout: 4000,
-    upgradeTimeout: 5000,
+    pingInterval: process.env.PING_INTERVAL || 2000,
+    pingTimeout: process.env.PING_TIMEOUT || 4000,
+    upgradeTimeout: process.env.UPGRADE_TIMEOUT || 5000,
 })
 
 const rooms = {}
