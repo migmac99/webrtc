@@ -26,7 +26,9 @@ export default function Room(props) {
 
   return (
     <div>
-      <StreamConnection {...{ roomID, userVideo, peersRef, socketRef, set_peers, set_userUpdate }} />
+      <StreamConnection {...{ roomID, userVideo, peersRef, socketRef, peers, set_peers, set_userUpdate }} />
+
+      <code>{JSON.stringify(peers.map((peer) => peer.peerID), null, 2)}</code>
 
       <div style={{ height: h, width: w }}>
         <Video ref={userVideo} />

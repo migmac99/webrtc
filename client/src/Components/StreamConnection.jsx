@@ -30,8 +30,25 @@ export default function StreamConnection({
   roomID,
   userVideo,
   peersRef, socketRef,
-  set_peers, set_userUpdate,
+  peers, set_peers,
+  set_userUpdate,
 }) {
+
+  useEffect(() => {
+    // console.log(peers.map((peer) => peer.peerID))
+    const uniquePeers = []
+    peers.forEach((peer) => {
+      if (uniquePeers.find((p) => p.peerID === peer.peerID)) {
+        console.log(`${prefix} Found duplicate local peer ${c.bright}${c.red}${peer.peerID}${c.r}`)
+        // disconnect and reconnect to duplicate peer
+      } else uniquePeers.push(peer)
+    })
+
+    if (uniquePeers.length === peers.length) return
+
+    console.log(`${prefix} Found and removed duplicate local peer`)
+    set_peers(uniquePeers)
+  }, [peers, peersRef, set_peers])
 
   useEffect(() => {
     const oldRef = socketRef.current
