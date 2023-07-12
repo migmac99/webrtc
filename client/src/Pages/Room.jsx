@@ -7,7 +7,7 @@ import { Video } from '../Components/Video'
 import Controls from '../Components/Controls'
 import PeerVideo from '../Components/PeerVideo'
 
-const Room = (props) => {
+export default function Room(props) {
   const [peers, set_peers] = useState([])
   const [userUpdate, set_userUpdate] = useState([])
 
@@ -21,13 +21,14 @@ const Room = (props) => {
   }
 
   useEffect(() => {
-    socketRef.current = io.connect('/')
+    socketRef.current = io.connect('http://localhost:8000')
     createStream({
       roomID, videoConstraints,
       userVideo,
       peersRef, socketRef,
       set_peers, set_userUpdate,
     })
+    console.log('Room.jsx: useEffect: createStream', socketRef.current)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const w = '16rem'
@@ -54,5 +55,3 @@ const Room = (props) => {
     </div>
   )
 }
-
-export default Room

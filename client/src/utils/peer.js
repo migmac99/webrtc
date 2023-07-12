@@ -11,6 +11,7 @@ export const peerConfig = {
 }
 
 //==================================================================================================
+const logs = process.env.LOGS || false
 
 export function createStream({
   roomID, videoConstraints,
@@ -19,12 +20,15 @@ export function createStream({
   set_peers, set_userUpdate,
 }) {
 
+  logs && console.log('createStream', roomID, videoConstraints)
+
   navigator.mediaDevices
-    .getUserMedia({ video: videoConstraints, audio: true })
+    .getUserMedia({ video: videoConstraints, audio: false })
     .then((stream) => {
       userVideo.current.srcObject = stream
 
       socketRef.current.emit('join room', roomID)
+      logs && console.log('Join room', roomID)
 
       socketRef.current.on('all users', (users) => {
         console.log(users)
@@ -55,6 +59,7 @@ export function createStream({
       })
 
       socketRef.current.on('user left', (id) => {
+        logs && console.log('user left', id)
         const peerObj = peersRef.current.find((p) => p.peerID === id)
         if (peerObj) peerObj.peer.destroy()
         const peers = peersRef.current.filter((p) => p.peerID !== id)
@@ -63,17 +68,22 @@ export function createStream({
       })
 
       socketRef.current.on('receiving returned signal', (payload) => {
+        logs && console.log('receiving returned signal', payload)
         const item = peersRef.current.find((p) => p.peerID === payload.id)
         item.peer.signal(payload.signal)
       })
 
-      socketRef.current.on('change', (payload) => set_userUpdate(payload))
+      socketRef.current.on('change', (payload) => {
+        logs && console.log('change', payload)
+        set_userUpdate(payload)
+      })
     })
 }
 
 //==================================================================================================
 
 export function createPeer(userToSignal, callerID, stream, socketRef) {
+  console.log('createPeer', userToSignal, callerID)
   const peer = new Peer({
     initiator: true,
     trickle: false,
@@ -91,6 +101,7 @@ export function createPeer(userToSignal, callerID, stream, socketRef) {
 //==================================================================================================
 
 export function addPeer(incomingSignal, callerID, stream, socketRef) {
+  console.log('addPeer', incomingSignal, callerID)
   const peer = new Peer({
     initiator: false,
     trickle: false,
@@ -101,6 +112,7 @@ export function addPeer(incomingSignal, callerID, stream, socketRef) {
   peer.on('signal', (signal) => {
     socketRef.current.emit('returning signal', { signal, callerID })
   })
+
 
   peer.signal(incomingSignal)
   return peer

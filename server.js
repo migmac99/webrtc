@@ -17,12 +17,12 @@ const rooms = {}
 
 const ROOM_SIZE = process.env.ROOM_SIZE || 22
 const PORT = process.env.PORT || 8000
-const logs = process.env.LOGS || false
+const logs = process.env.LOGS || true
 
 io.on('connection', socket => {
-    logs && console.log('Connection from ->', [socket.id])
-
+    logs && console.log('Connection from ->', socket.id)
     socket.on('join room', roomID => {
+        logs && console.log('Join Room ->', roomID, '->', [socket.id])
         if (rooms[roomID]) {
             const length = rooms[roomID].length
             if (length >= ROOM_SIZE) {
