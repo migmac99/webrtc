@@ -1,7 +1,7 @@
 
 import React from 'react'
 
-export const Video = React.forwardRef((props, ref) => {
+const Video = React.forwardRef((props, ref) => {
   const { external } = props
 
   const borderSize = '0.2rem'
@@ -30,3 +30,5 @@ export const Video = React.forwardRef((props, ref) => {
     </div>
   )
 })
+
+export default Video

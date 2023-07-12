@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import io from 'socket.io-client'
 
-import { createStream } from '../utils/peer'
-
-import { Video } from '../Components/Video'
+import Video from '../Components/Video'
 import Controls from '../Components/Controls'
 import PeerVideo from '../Components/PeerVideo'
+import StreamConnection from '../Components/StreamConnection'
 
 export default function Room(props) {
   const [peers, set_peers] = useState([])
@@ -16,26 +15,18 @@ export default function Room(props) {
   const peersRef = useRef([])
 
   const roomID = props.match.params.roomID
-  const videoConstraints = {
-    minFrameRate: 60,
-  }
 
   useEffect(() => {
     socketRef.current = io.connect('http://localhost:8000')
-    createStream({
-      roomID, videoConstraints,
-      userVideo,
-      peersRef, socketRef,
-      set_peers, set_userUpdate,
-    })
-    console.log('Room.jsx: useEffect: createStream', socketRef.current)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    // console.log('Room.jsx: useEffect: createStream', socketRef.current)
+  }, [])
 
   const w = '16rem'
   const h = '10rem'
 
   return (
     <div>
+      <StreamConnection {...{ roomID, userVideo, peersRef, socketRef, set_peers, set_userUpdate }} />
 
       <div style={{ height: h, width: w }}>
         <Video ref={userVideo} />

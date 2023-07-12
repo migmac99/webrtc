@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 
-import { Video } from './Video'
+import Video from './Video'
 import { ControlSmall } from './Controls'
 
 export default function PeerVideo({ peersRef, peer, userUpdate }) {
@@ -9,7 +9,7 @@ export default function PeerVideo({ peersRef, peer, userUpdate }) {
   const _peer = peersRef.current.find((p) => p.peerID === peer.peerID).peer
 
   useEffect(() => {
-    console.log(peersRef.current, _peer, ref)
+    // console.log(peersRef.current, _peer, ref)
     _peer.on('stream', (stream) => { ref.current.srcObject = stream })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
