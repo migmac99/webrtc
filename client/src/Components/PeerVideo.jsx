@@ -5,7 +5,13 @@ import { ControlSmall } from './Controls'
 
 export default function PeerVideo({ peersRef, peer, userUpdate }) {
 
-  const ref = useRef(peersRef.current.find((p) => p.peerID === peer.peerID).ref)
+  const ref = useRef(
+    () => {
+      const foundPeer = peersRef.current.find((p) => p.peerID === peer.peerID)
+      if (foundPeer) return foundPeer.ref
+      else return null
+    }
+  )
   const _peer = peersRef.current.find((p) => p.peerID === peer.peerID).peer
 
   useEffect(() => {
@@ -14,7 +20,7 @@ export default function PeerVideo({ peersRef, peer, userUpdate }) {
       if (!stream || !ref.current) return
       ref.current.srcObject = stream
     })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [_peer, ref])
 
   let audioFlagTemp = true
   let videoFlagTemp = true

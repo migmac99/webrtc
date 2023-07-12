@@ -35,20 +35,25 @@ export default function StreamConnection({
 }) {
 
   useEffect(() => {
-    // console.log(peers.map((peer) => peer.peerID))
     const uniquePeers = []
+    const duplicates = []
     peers.forEach((peer) => {
       if (uniquePeers.find((p) => p.peerID === peer.peerID)) {
-        console.log(`${prefix} Found duplicate local peer ${c.bright}${c.red}${peer.peerID}${c.r}`)
-        // disconnect and reconnect to duplicate peer
+        duplicates.push(peer)
+        logs && console.log(`${prefix} Found duplicate local peer ${c.bright}${c.red}${peer.peerID}${c.r}`)
       } else uniquePeers.push(peer)
     })
 
-    if (uniquePeers.length === peers.length) return
+    duplicates.forEach((peer) => {
+      const index = peers.indexOf(peer)
+      if (index > -1) peers.splice(index, 1)
+    })
 
-    console.log(`${prefix} Found and removed duplicate local peer`)
+    if (peers.length === uniquePeers.length) return
     set_peers(uniquePeers)
-  }, [peers, peersRef, set_peers])
+
+    // console.log(`${prefix} Found and removed duplicate local peer`)
+  }, [peers, set_peers])
 
   useEffect(() => {
     const oldRef = socketRef.current
@@ -64,11 +69,15 @@ export default function StreamConnection({
         logs && console.log(`${p_send} Join room ${c.green}${roomID}${c.r}`)
 
         socketRef.current.on('all users', (users) => {
-          // console.log(users)
+          logs && console.log(`${p_recv} All Users`, users)
           const peers = []
 
+          // if socketRef.current.id is already in users, remove it
+          users = users.filter((id) => id !== socketRef.current.id)
+          logs && console.log(`${prefix} Filtered Users`, users)
+
           users.forEach((userID) => {
-            const peer = createPeer(userID, socketRef.current.id, stream, socketRef)
+            const peer = createOrAddPeer({ userToSignal: userID, callerID: socketRef.current.id, stream, socketRef, peersRef })
             const peerObj = {
               peerID: userID,
               peer,
@@ -82,7 +91,7 @@ export default function StreamConnection({
 
         socketRef.current.on('user joined', (payload) => {
           logs && console.log(`${p_recv} User Joined`, payload)
-          const peer = addPeer(payload.signal, payload.callerID, stream, socketRef)
+          const peer = createOrAddPeer({ incomingSignal: payload.signal, callerID: payload.callerID, stream, socketRef, peersRef })
           const peerObj = {
             peerID: payload.callerID,
             peer,
@@ -114,26 +123,43 @@ export default function StreamConnection({
 
 
     return () => {
-      logs && console.log('close stream')
+      logs && console.log(`${p_send} Leaving room ${c.green}${roomID}${c.r}`)
       oldRef.current.emit('leave room', roomID)
+      logs && console.log(`${prefix} Destroying stream connection`)
       oldRef.current.off('all users')
       oldRef.current.off('user joined')
       oldRef.current.off('user left')
       oldRef.current.off('receiving returned signal')
       oldRef.current.off('change')
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return null
 }
 
 //==================================================================================================
 
-export function createPeer(userToSignal, callerID, stream, socketRef) {
-  logs && console.log(`${p_send} Peer Connection Request from ${c.yellow}${callerID}${c.r} to ${c.green}${userToSignal}${c.r}`)
+export function createOrAddPeer({ incomingSignal, userToSignal, callerID, stream, socketRef, peersRef }) {
+  const initiator = incomingSignal === undefined
+
+  // check if callerID already exists in socketRef.current
+  // show all peersRef.current.peerID
+  const ps = peersRef.current.map((p) => p.peerID)
+  const exists = ps.includes(userToSignal)
+  if (exists) {
+    logs && console.log(`${prefix} Peer ${c.bright}${c.cyan}${userToSignal}${c.r} already exists`)
+    logs && console.log('=============================================================')
+    return
+  }
+
+
+  logs && console.log(initiator ?
+    `${p_send} Peer Connection Request from ${c.yellow}${callerID}${c.r} to ${c.green}${userToSignal}${c.r}` :
+    `${prefix} Adding ${c.green}${callerID}${c.r} as peer`
+  )
 
   const peer = new Peer({
-    initiator: true,
+    initiator,
     trickle: false,
     stream,
     config: peerConfig,
@@ -141,30 +167,17 @@ export function createPeer(userToSignal, callerID, stream, socketRef) {
 
   peer.on('signal', (signal) => {
     logs && console.log(`${p_recv} Accepted request by ${c.green}${userToSignal}${c.r}`)
-    socketRef.current.emit('sending signal', { userToSignal, callerID, signal })
-    logs && console.log(`${p_send} Sending signal to ${c.green}${userToSignal}${c.r}`)
+
+    if (initiator) {
+      socketRef.current.emit('sending signal', { userToSignal, callerID, signal })
+      logs && console.log(`${p_send} Sending signal to ${c.green}${userToSignal}${c.r}`)
+    } else {
+      socketRef.current.emit('returning signal', { signal, callerID })
+      logs && console.log(`${p_send} Returning signal to ${c.green}${callerID}${c.r}`)
+    }
   })
 
-  return peer
-}
+  if (!initiator) peer.signal(incomingSignal)
 
-//==================================================================================================
-
-export function addPeer(incomingSignal, callerID, stream, socketRef) {
-  logs && console.log(`${prefix} Adding ${c.green}${callerID}${c.r} as peer`)
-  const peer = new Peer({
-    initiator: false,
-    trickle: false,
-    stream,
-    config: peerConfig,
-  })
-
-  peer.on('signal', (signal) => {
-    logs && console.log(`${p_recv} Accepted request by ${c.green}${callerID}${c.r}`)
-    socketRef.current.emit('returning signal', { signal, callerID })
-    logs && console.log(`${p_send} Returning signal to ${c.green}${callerID}${c.r}`)
-  })
-
-  peer.signal(incomingSignal)
   return peer
 }

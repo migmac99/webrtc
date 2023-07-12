@@ -62,6 +62,10 @@ io.on('connection', socket => {
             }
         }
         socket.broadcast.emit('user left', socket.id)
+
+        if (!rooms[roomID]) return
+        const usersInThisRoom = rooms[roomID].filter(id => id !== socket.id)
+        socket.broadcast.emit('all users', usersInThisRoom)
         logs && console.log('user left', socket.id)
     })
 
