@@ -38,6 +38,7 @@ io.on('connection', socket => {
         const usersInThisRoom = rooms[roomID].filter(id => id !== socket.id)
         socket.emit('all users', usersInThisRoom)
         logs && console.log('Join', roomID, '->', [socket.id])
+        Cleanup(socket.id, roomID)
     })
 
     socket.on('sending signal', payload => {
@@ -74,6 +75,21 @@ io.on('connection', socket => {
         logs && console.log('change', payload)
     })
 })
+
+// remove id from all other rooms except roomID and if room is empty delete it
+function Cleanup(id, roomID) {
+    logs && console.log(`Removing ${id} duplicate from ${roomID}`)
+
+    Object.keys(rooms).forEach(room => {
+        if (room !== roomID) {
+            let newRoom = rooms[room].filter(_id => _id !== id)
+            if (newRoom.length === 0) {
+                delete rooms[room]
+                logs && console.log('Deleting room ->', room)
+            } else rooms[room] = newRoom
+        }
+    })
+}
 
 server.listen(PORT, () => console.log('server is running on port', PORT, '...'))
 
