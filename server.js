@@ -88,6 +88,14 @@ function Cleanup(id, roomID) {
                 logs && console.log('Deleting room ->', room)
             } else rooms[room] = newRoom
         }
+
+        if (rooms[room]) {
+            const duplicates = rooms[room].filter(_id => _id === id)
+            if (duplicates.length > 1) {
+                rooms[room] = rooms[room].filter(_id => _id !== id)
+                logs && console.log(`Removing ${id} duplicate from ${room}`)
+            }
+        }
     })
 }
 
@@ -97,3 +105,8 @@ server.listen(PORT, () => console.log('server is running on port', PORT, '...'))
 // For debugging only, not required for production
 app.get('/', (req, res) => res.sendFile(__dirname + '/viewRooms.html'))
 app.get('/api/rooms', (req, res) => res.send(rooms))
+app.get('/api/clear', (req, res) => {
+    logs && console.log('Clearing rooms')
+    Object.keys(rooms).forEach(room => delete rooms[room])
+    res.send(rooms)
+})
