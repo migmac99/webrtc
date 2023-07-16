@@ -1,10 +1,5 @@
 import React, { useState } from 'react'
 
-import micmute from '../assets/micmute.svg'
-import micunmute from '../assets/micunmute.svg'
-import webcam from '../assets/webcam.svg'
-import webcamoff from '../assets/webcamoff.svg'
-
 const outerStyle = {
   display: 'flex',
   zIndex: 1,
@@ -13,10 +8,24 @@ const outerStyle = {
   bottom: '0.7rem',
 }
 
+const a = 0.4
+
+const controlStyle = {
+  backgroundColor: `rgba(255, 255, 255, ${a})`,
+  borderRadius: '1rem',
+  display: 'flex',
+  justifyContent: 'flex-start',
+  flexShrink: 1,
+  alignItems: 'center',
+  padding: '0.1rem 0.4rem',
+  zIndex: 2,
+}
+
 export default function Controls({ userVideo, socketRef, userUpdate }) {
 
   const [audioFlag, setAudioFlag] = useState(true)
   const [videoFlag, setVideoFlag] = useState(true)
+  const [hover, set_hover] = useState(false)
 
   function Toggle(type) {
     if (!userVideo.current.srcObject) return
@@ -33,26 +42,26 @@ export default function Controls({ userVideo, socketRef, userUpdate }) {
     type === 'video' ? setVideoFlag(!videoFlag) : setAudioFlag(!audioFlag)
   }
 
+  const _a = hover ? 1 : a
+
   return (
-    <div style={outerStyle}>
+    <div
+      style={outerStyle}
+      onMouseEnter={() => set_hover(true)}
+      onMouseLeave={() => set_hover(false)}
+    >
       <div style={{ flexGrow: 1 }} />
 
-      <div style={{
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        borderRadius: '1rem',
-        display: 'flex',
-        justifyContent: 'flex-start',
-        flexShrink: 1,
-        alignItems: 'center',
-        zIndex: 2,
-      }}>
+      <div style={{ ...controlStyle, backgroundColor: `rgba(255, 255, 255, ${_a})` }}>
         <Toggler {...{
-          src: videoFlag ? webcam : webcamoff,
+          icon: 'video',
+          enabled: videoFlag,
           onClick: () => Toggle('video'),
         }} />
 
         <Toggler {...{
-          src: audioFlag ? micunmute : micmute,
+          icon: 'audio',
+          enabled: audioFlag,
           onClick: () => Toggle('audio'),
         }} />
       </div>
@@ -64,33 +73,34 @@ export function ControlSmall({ audio, video }) {
   return (
     <div style={outerStyle}>
       <div style={{ flexGrow: 1 }} />
-      <div style={{
-        backgroundColor: 'rgba(0,0,0,0.2)',
-        borderRadius: '1rem',
-        display: 'flex',
-        justifyContent: 'flex-start',
-        flexShrink: 1,
-        alignItems: 'center',
-        zIndex: 2,
-      }}>
-        <Toggler {...{ src: video ? webcam : webcamoff }} />
-        <Toggler {...{ src: audio ? micunmute : micmute }} />
+      <div style={controlStyle}>
+        <Toggler {...{ icon: 'video', enabled: video }} />
+        <Toggler {...{ icon: 'audio', enabled: audio }} />
       </div>
     </div>
   )
 }
 
-function Toggler({ src, onClick }) {
+function Toggler({ icon, enabled, onClick }) {
+
+  const [hover, set_hover] = useState(false)
+
+  if (icon === 'video') icon = 'pi-camera'
+  if (icon === 'audio') icon = 'pi-microphone'
+
   return (
-    <img
-      alt='toggle'
-      src={src}
+    <i
+      className={`pi ${icon}`}
       style={{
-        height: '1.5rem',
-        cursor: 'pointer',
+        fontSize: '1.5rem',
+        cursor: onClick && 'pointer',
         margin: '0.2rem',
+        color: enabled ? 'forestgreen' : 'maroon',
         opacity: onClick ? 1 : 0.5,
+        filter: onClick && hover && 'brightness(1.5)',
       }}
+      onMouseEnter={() => set_hover(true)}
+      onMouseLeave={() => set_hover(false)}
       onClick={onClick}
     />
   )

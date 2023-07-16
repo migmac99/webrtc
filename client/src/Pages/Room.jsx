@@ -35,7 +35,9 @@ export default function Room(props) {
 
       <hr style={{ marginBottom: '2rem' }} />
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'left', alignItems: 'left', }}>
+
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'left', alignItems: 'left' }}>
 
         <div style={{ width: w, height: h, position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 
