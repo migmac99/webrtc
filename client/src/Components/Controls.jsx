@@ -5,6 +5,14 @@ import micunmute from '../assets/micunmute.svg'
 import webcam from '../assets/webcam.svg'
 import webcamoff from '../assets/webcamoff.svg'
 
+const outerStyle = {
+  display: 'flex',
+  zIndex: 1,
+  position: 'absolute',
+  right: '0.8rem',
+  bottom: '0.7rem',
+}
+
 export default function Controls({ userVideo, socketRef, userUpdate }) {
 
   const [audioFlag, setAudioFlag] = useState(true)
@@ -26,12 +34,7 @@ export default function Controls({ userVideo, socketRef, userUpdate }) {
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      zIndex: 1,
-      marginTop: '-2.2rem',
-      margin: '-2.2rem 0.3rem 0 0.3rem',
-    }}>
+    <div style={outerStyle}>
       <div style={{ flexGrow: 1 }} />
 
       <div style={{
@@ -59,12 +62,7 @@ export default function Controls({ userVideo, socketRef, userUpdate }) {
 
 export function ControlSmall({ audio, video }) {
   return (
-    <div style={{
-      display: 'flex',
-      zIndex: 1,
-      marginTop: '-2.2rem',
-      margin: '-2.2rem 0.3rem 0 0.3rem',
-    }}>
+    <div style={outerStyle}>
       <div style={{ flexGrow: 1 }} />
       <div style={{
         backgroundColor: 'rgba(0,0,0,0.2)',

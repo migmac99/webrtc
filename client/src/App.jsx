@@ -4,7 +4,9 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import CreateRoom from './Pages/CreateRoom'
 import Room from './Pages/Room'
 
-function App() {
+import 'primeicons/primeicons.css'
+
+export default function App() {
   return (
     <BrowserRouter>
       <Switch>
@@ -14,5 +16,3 @@ function App() {
     </BrowserRouter>
   )
 }
-
-export default App
